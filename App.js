@@ -2,6 +2,16 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 
+var total = 0;
+var won = 0;
+var lose = 0;
+var tied = 0;
+var winsPercent;
+var lossesPercent;
+var tiePercent;;
+
+
+
 const CHOICES = [
   {
     name: 'rock',
@@ -48,8 +58,16 @@ const getRoundOutcome = userChoice => {
   if (userChoice === 'scissors') {
     result = computerChoice === 'paper' ? 'Victory!' : 'Defeat!';
   }
-
   if (userChoice === computerChoice) result = 'Tie game!';
+
+  if(result==='Victory!'){
+    won++;
+  }if(result==='Defeat!'){
+    lose++;
+  }
+  if(result==='Tie game!'){
+    tied++;
+  }
   return [result, computerChoice];
 };
 
@@ -63,6 +81,13 @@ export default class App extends React.Component {
       gamePrompt: 'Fire!',
       userChoice: {},
       computerChoice: {},
+      total: 0,
+      won: 0,
+      lose: 0,
+      tied: 0,
+      winsPercent: 0,
+      lossesPercent: 0,
+      tiePercent: 0
     }
   }
 
@@ -71,11 +96,24 @@ export default class App extends React.Component {
   
     const newUserChoice = CHOICES.find(choice => choice.name === playerChoice);
     const newComputerChoice = CHOICES.find(choice => choice.name === compChoice);
+
+    total++;
+
+    winsPercent = (won/total*100).toFixed(2);
+    lossesPercent = (lose/total*100).toFixed(2);
+    tiePercent = (tied/total*100).toFixed(2);
   
     this.setState({
       gamePrompt: result,
       userChoice: newUserChoice,
-      computerChoice: newComputerChoice
+      computerChoice: newComputerChoice,
+      total: total,
+      won: won,
+      lose: lose,
+      tied: tied,
+      winsPercent: winsPercent,
+      lossesPercent: lossesPercent,
+      tiePercent: tiePercent
     })
   };
 
@@ -89,6 +127,12 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         <Text style={{ fontSize: 35, color: this.getResultColor() }}>{this.state.gamePrompt}</Text>
+        <Text>Total game played: {this.state.total} </Text>
+        <View style={{flexDirection:'row'}}>
+          <Text>Won: {this.state.won} ({this.state.winsPercent}%) </Text>
+          <Text>Lose: {this.state.lose} ({this.state.lossesPercent}%) </Text>
+          <Text>Tied: {this.state.tied} ({this.state.tiePercent}%) </Text>
+        </View>
         <View style={styles.choicesContainer}>
         <ChoiceCard player="Player" choice={this.state.userChoice}/>
         <Text style={{ color: '#250902' }}>vs</Text>
@@ -133,9 +177,9 @@ const styles = StyleSheet.create({
   choicesContainer: {
     margin: 10,
     borderWidth: 2,
-    paddingTop: 100,
+    paddingTop: 80,
     shadowRadius: 5,
-    paddingBottom: 100,
+    paddingBottom: 80,
     borderColor: 'grey',
     shadowOpacity: 0.90,
     flexDirection: 'row',
