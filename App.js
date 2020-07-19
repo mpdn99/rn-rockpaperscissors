@@ -35,35 +35,8 @@ const ChoiceCard = ({ player, choice: { uri, name } }) => {
   );
 };
 
-
-
-export default class App extends React.Component {
-  constructor(props){
-    super(props)
-    this.state = {
-      gamePrompt: 'Fire!',
-      userChoice: {},
-      computerChoice: {}
-    }
-  }
-
-  onPress = playerChoice => {
-    const [result, compChoice] = this.getRoundOutcome(playerChoice);
-  
-    const newUserChoice = CHOICES.find(choice => choice.name === playerChoice);
-    const newComputerChoice = CHOICES.find(choice => choice.name === compChoice);
-  
-    this.setState({
-      gamePrompt: result,
-      userChoice: newUserChoice,
-      computerChoice: newComputerChoice
-    })
-  };
-
-randomComputerChoice = () => CHOICES[Math.floor(Math.random() * CHOICES.length)];
-
-getRoundOutcome = userChoice => {
-  const computerChoice = this.randomComputerChoice().name;
+const getRoundOutcome = userChoice => {
+  const computerChoice = randomComputerChoice().name;
   let result;
 
   if (userChoice === 'rock') {
@@ -80,10 +53,42 @@ getRoundOutcome = userChoice => {
   return [result, computerChoice];
 };
 
+const randomComputerChoice = () =>
+  CHOICES[Math.floor(Math.random() * CHOICES.length)];
+
+export default class App extends React.Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      gamePrompt: 'Fire!',
+      userChoice: {},
+      computerChoice: {},
+    }
+  }
+
+  onPress = playerChoice => {
+    const [result, compChoice] = getRoundOutcome(playerChoice);
+  
+    const newUserChoice = CHOICES.find(choice => choice.name === playerChoice);
+    const newComputerChoice = CHOICES.find(choice => choice.name === compChoice);
+  
+    this.setState({
+      gamePrompt: result,
+      userChoice: newUserChoice,
+      computerChoice: newComputerChoice
+    })
+  };
+
+  getResultColor = () => {
+    if (this.state.gamePrompt === 'Victory!') return 'green';
+    if (this.state.gamePrompt === 'Defeat!') return 'red';
+    return null;
+  };
+
   render(){
     return (
       <View style={styles.container}>
-        <Text>{this.state.gamePrompt}</Text>
+        <Text style={{ fontSize: 35, color: this.getResultColor() }}>{this.state.gamePrompt}</Text>
         <View style={styles.choicesContainer}>
         <ChoiceCard player="Player" choice={this.state.userChoice}/>
         <Text style={{ color: '#250902' }}>vs</Text>
